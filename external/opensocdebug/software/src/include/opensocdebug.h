@@ -67,7 +67,8 @@ enum osd_module_types {
     OSD_MOD_DEM_UART = 2,
     OSD_MOD_MAM = 3,
     OSD_MOD_STM = 4,
-    OSD_MOD_CTM = 5
+    OSD_MOD_CTM = 5,
+    OSD_MOD_SYSTEM_DIAGNOSIS = 6
 };
 
 struct osd_memory_descriptor {
