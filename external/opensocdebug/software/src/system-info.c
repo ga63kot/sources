@@ -28,13 +28,14 @@
 #include <libglip.h>
 #include <assert.h>
 
-const struct module_types module_lookup[6] = {
+const struct module_types module_lookup[7] = {
         { .name = "HOST" },
         { .name = "SCM" },
         { .name = "DEM-UART" },
         { .name = "MAM" },
         { .name = "STM" },
-        { .name = "CTM" }
+        { .name = "CTM" },
+	{ .name = "System-Diagnosis"}
 };
 
 const uint16_t scmid = 0x1;
