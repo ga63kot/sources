@@ -257,6 +257,14 @@ static int interpret(struct osd_context *ctx, char *line) {
 
             sleep(sec);
         }
+    } else if (CHECK_MATCH(cmd, "confreg")) {
+        char *subcmd = strtok(NULL, " ");
+
+        if (CHECK_MATCH(subcmd, "help")) {
+            PRINT_HELP(confreg);
+        } else if (CHECK_MATCH(subcmd, "test")) {
+            write_configreg(ctx);
+        }
     } else {
         fprintf(stderr, "Unknown command: %s\n", cmd);
         PRINT_HELP(cmd);
