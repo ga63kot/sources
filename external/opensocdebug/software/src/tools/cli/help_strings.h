@@ -46,7 +46,7 @@ static const char* help_cmd =
         "  mem         Access memory\n"
         "  ctm         Configure core trace module\n"
         "  stm         Configure software trace module\n"
-	"  confreg     Loads config for System Diagnosis\n";
+	"  confreg     Loads config for System Diagnosis\n"
         "  terminal    Start terminal for device emulation module\n"
         "  wait        Wait for given seconds\n";
 
