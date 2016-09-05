@@ -46,6 +46,7 @@ static const char* help_cmd =
         "  mem         Access memory\n"
         "  ctm         Configure core trace module\n"
         "  stm         Configure software trace module\n"
+	"  confreg     Loads config for System Diagnosis\n";
         "  terminal    Start terminal for device emulation module\n"
         "  wait        Wait for given seconds\n";
 
@@ -88,6 +89,11 @@ static const char* help_ctm_log =
         "  file     Filename to log to\n"
         "  ctmid    CTM to receive logs from\n"
         "  elffile  ELF file to load symbols from, optional\n";
+
+static const char* help_confreg =
+        "Available subcommands:\n"
+        "  help        Print this help\n"
+        "  test        Loads config for System Diagnosis\n";
 
 static const char* help_terminal =
         "Usage: terminal <id>\n"
