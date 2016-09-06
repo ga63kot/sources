@@ -92,17 +92,17 @@ module compute_tile_dm
    assign wb_mem_rst_i = rst_sys;
 
 
-   dii_flit [CONFIG.DEBUG_NUM_MODS+1-1:0] dii_in;
-   logic [CONFIG.DEBUG_NUM_MODS+1-1:0]    dii_in_ready;
-   dii_flit [CONFIG.DEBUG_NUM_MODS+1-1:0] dii_out;
-   logic [CONFIG.DEBUG_NUM_MODS+1-1:0]    dii_out_ready;
+   dii_flit [CONFIG.DEBUG_NUM_MODS-2:0] dii_in;
+   logic [CONFIG.DEBUG_NUM_MODS-2:0]    dii_in_ready;
+   dii_flit [CONFIG.DEBUG_NUM_MODS-2:0] dii_out;
+   logic [CONFIG.DEBUG_NUM_MODS-2:0]    dii_out_ready;
 
    generate
       if (CONFIG.USE_DEBUG == 1) begin
 
          genvar i;
-         logic [CONFIG.DEBUG_NUM_MODS+1-1:0][9:0] id_map;
-         for (i = 0; i < CONFIG.DEBUG_NUM_MODS+1; i = i+1) begin
+         logic [CONFIG.DEBUG_NUM_MODS-1:0][9:0] id_map;
+         for (i = 0; i < CONFIG.DEBUG_NUM_MODS; i = i+1) begin
             assign id_map[i][9:0] = 10'(DEBUG_BASEID+i);
          end
 
@@ -310,6 +310,25 @@ module compute_tile_dm
                  .debug_out (dii_in[1 + c*CONFIG.DEBUG_MODS_PER_CORE + 1]),
                  .debug_out_ready (dii_in_ready[1 + c*CONFIG.DEBUG_MODS_PER_CORE + 1]),
                  .trace_port (trace[c]));
+
+      	    osd_system_diagnosis #(
+            	.SYSTEMID (ID),
+         	.NUM_MOD  (5))
+            u_system_diagnosis (
+         	.clk(clk),
+         	.rst(rst_dbg),
+
+         	.id  (DEBUG_BASEID + 1 + c*CONFIG.DEBUG_MODS_PER_CORE + 2),
+         	.debug_in   (dii_out[1 + c*CONFIG.DEBUG_MODS_PER_CORE + 2]),
+         	.debug_in_ready (dii_out_ready[1 + c*CONFIG.DEBUG_MODS_PER_CORE + 2]),
+         	.debug_out (dii_in[1 + c*CONFIG.DEBUG_MODS_PER_CORE + 2]),
+         	.debug_out_ready (dii_in_ready[1 + c*CONFIG.DEBUG_MODS_PER_CORE + 2]),
+         	// System Interface
+//		 .trace (trace),
+         	.wb_adr_i                   (wb_mem_adr_i),
+        	.wb_sel_i                   (wb_mem_sel_i),
+        	.wb_we_i                    (wb_mem_we_i));
+
          end
       end
    endgenerate
@@ -404,6 +423,7 @@ module compute_tile_dm
            .cti_o(mam_cti_o),
            .bte_o(mam_bte_o),
            .sel_o(mam_sel_o));
+
    end //if (USE_DEBUG == 1)
 
    /* mam_wb_adapter AUTO_TEMPLATE(
@@ -605,29 +625,6 @@ module compute_tile_dm
                 .wb_stb_i               (bussl_stb_i[2]),        // Templated
                 .wb_sel_i               (bussl_sel_i[2][3:0]));  // Templated
 
-   osd_system_diagnosis
-      #(
-         .SYSTEMID (1),
-         .NUM_MOD  (3)
-      )
-      u_system_diagnosis (
-         .clk(clk),
-         .rst(rst),
-
-         .id  (3),
-         .debug_in   (dii_in[2]),
-         .debug_in_ready (dii_in_ready[2]),
-         .debug_out (dii_out[2]),
-         .debug_out_ready (dii_out_ready[2]),
-         // System Interface
-	 .trace (trace),
-
-         .wb_adr_i                   (wb_mem_adr_i),
-         .wb_sel_i                   (wb_mem_sel_i),
-         .wb_we_i                    (wb_mem_we_i),
-
-         .sys_rst(sys_rst),
-         .cpu_rst(cpu_rst));
 endmodule
 
 // Local Variables:
