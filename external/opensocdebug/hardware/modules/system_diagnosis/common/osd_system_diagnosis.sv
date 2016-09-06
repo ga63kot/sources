@@ -19,11 +19,7 @@ module osd_system_diagnosis
 
     input [32-1:0]  wb_adr_i,
     input [4-1:0]   wb_sel_i,
-    input           wb_we_i,
-
-
-    output sys_rst,
-    output cpu_rst);
+    input           wb_we_i);
 
    logic        reg_request;
    logic        reg_write;
@@ -35,11 +31,7 @@ module osd_system_diagnosis
    logic [15:0] reg_rdata;
 
    logic [15:0] config_reg [`DIAGNOSIS_CONF_FLITS_PER_ENTRY*`DIAGNOSIS_PC_EVENTS_MAX*2-1:0];
-   logic [`DIAGNOSIS_CONF_FLITS_PER_ENTRY*16*`DIAGNOSIS_PC_EVENTS_MAX*2-1:0] conf_mem;  
-
-   logic [1:0]  rst_vector;
-   assign sys_rst = rst_vector[0] | rst;
-   assign cpu_rst = rst_vector[1] | rst;
+   logic [`DIAGNOSIS_CONF_FLITS_PER_ENTRY*16*`DIAGNOSIS_PC_EVENTS_MAX*2-1:0] conf_mem;
    
    osd_regaccess
        #(.MODID(16'h6), .MODVERSION(16'h0),
@@ -61,12 +53,6 @@ module osd_system_diagnosis
       endcase // case (reg_addr)
    end // always @ (*)
 
-   always_ff @(posedge clk)
-     if (rst)
-       rst_vector <= 2'b00;
-     else
-       if (reg_request & reg_write & (reg_addr == 16'h203))
-         rst_vector <= reg_wdata[1:0];
 
 // Assigning Config Register
    always_ff @(posedge clk)
