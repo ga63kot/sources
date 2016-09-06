@@ -131,10 +131,10 @@ module tb_compute_tile(
    endgenerate
 
    // OSD-based debug system
-   dii_flit [2:0] debug_ring_in;
-   dii_flit [2:0] debug_ring_out;
-   logic [2:0] debug_ring_in_ready;
-   logic [2:0] debug_ring_out_ready;
+   dii_flit [1:0] debug_ring_in;
+   dii_flit [1:0] debug_ring_out;
+   logic [1:0] debug_ring_in_ready;
+   logic [1:0] debug_ring_out_ready;
 
    generate
       if (CONFIG.USE_DEBUG == 1) begin
