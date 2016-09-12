@@ -324,7 +324,7 @@ module compute_tile_dm
          	.debug_out (dii_in[1 + c*CONFIG.DEBUG_MODS_PER_CORE + 2]),
          	.debug_out_ready (dii_in_ready[1 + c*CONFIG.DEBUG_MODS_PER_CORE + 2]),
          	// System Interface
-//		 .trace (trace),
+		.trace_port (trace[c]),
          	.wb_adr_i                   (wb_mem_adr_i),
         	.wb_sel_i                   (wb_mem_sel_i),
         	.wb_we_i                    (wb_mem_we_i));
