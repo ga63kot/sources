@@ -90,6 +90,10 @@ struct osd_ctm_descriptor {
   uint16_t data_width;
 };
 
+struct osd_system_diagnosis_descriptor {
+  uint16_t xlen;
+};
+
 static const int OSD_SUCCESS = 0;
 static const int OSD_E_GENERIC = 1;
 static const int OSD_E_CANNOTENUMERATE = 2;
