@@ -83,9 +83,12 @@
 ///*** Packetizer Module ******************************************************
 // Input Fifo Lengths
 // TODO: Find proper lengths for these fifos
-`define DIAGNOSIS_EVENT_FIFO_LENGTH 4
-`define DIAGNOSIS_GPR_FIFO_LENGTH 10
-`define DIAGNOSIS_STACK_FIFO_LENGTH 10
+//`define DIAGNOSIS_EVENT_FIFO_LENGTH 4
+//`define DIAGNOSIS_GPR_FIFO_LENGTH 10
+//`define DIAGNOSIS_STACK_FIFO_LENGTH 10
+`define DIAGNOSIS_EVENT_FIFO_LENGTH 30
+`define DIAGNOSIS_GPR_FIFO_LENGTH 30
+`define DIAGNOSIS_STACK_FIFO_LENGTH 30
 
 //*** Maximum size (i.e. number of 16 bit debug NoC flits) of a snapshot packet
 // that is forwarded to the Co-CPU via debug NoC
