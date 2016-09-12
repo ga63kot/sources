@@ -130,7 +130,7 @@ module Packetizer (/*AUTOARG*/
    reg                                 out_data34_valid;
    wire                                out_data34_ready;
 
-   packetizer_dbgnoc_if
+/*   packetizer_dbgnoc_if
      #(.CONF_MEM_SIZE(CONF_MEM_SIZE),
        .DBG_NOC_VCHANNELS(DBG_NOC_VCHANNELS),
 		 .DBG_NOC_CONF_VCHANNEL(DBG_NOC_CONF_VCHANNEL),
@@ -153,6 +153,26 @@ module Packetizer (/*AUTOARG*/
                             .dbgnoc_in_flit     (dbgnoc_in_flit[DBG_NOC_FLIT_WIDTH-1:0]),
                             .dbgnoc_in_valid    (dbgnoc_in_valid[DBG_NOC_VCHANNELS-1:0]),
                             .full_packetizer_fifo(any_input_fifo_full));
+*/
+
+//// NEW PACKETIZER
+  osd_trace_packetization
+    #(.WIDTH(34))
+  u_trace_packetization
+     (
+      .clk (clk),
+      .rst (rst),
+
+      .id (5),
+  
+      .trace_data (out_data34),
+      .trace_overflow (any_input_fifo_full),
+      .trace_valid (out_data34_valid),
+      .trace_ready(out_data34_ready),
+
+      .debug_out (dbgnoc_out_flit[DBG_NOC_FLIT_WIDTH-1:0]),
+      .debug_out_ready (dbgnoc_out_ready[DBG_NOC_VCHANNELS-1:0])
+      );
 
    
    /*** Input Fifos for Snapshot Modules and Event Fingerprints ***/
