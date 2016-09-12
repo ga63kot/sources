@@ -22,10 +22,9 @@ module diagnosis_system_P_without_snapshot(/*AUTOARG*/
    // Outputs
    dbgnoc_in_ready, dbgnoc_out_flit, dbgnoc_out_valid,
    // Inputs
-   clk, rst, time_global, traceport_flat, dbgnoc_in_flit,
+   clk, rst, time_global, trace_port, dbgnoc_in_flit,
    dbgnoc_in_valid, dbgnoc_out_ready, conf_mem
    );
-
 
    /** Configuration memory: 16 bit flits **/
    /** We have currently 3 x 16 bit flits for one config entry (including valid flag).
@@ -41,56 +40,49 @@ module diagnosis_system_P_without_snapshot(/*AUTOARG*/
   
  /* Core ID */
    parameter CORE_ID = 16'hx;
-   
-   
+    
    /** Debug NoC Parameters **/
    parameter DBG_NOC_DATA_WIDTH = `FLIT16_CONTENT_WIDTH;
    parameter DBG_NOC_FLIT_TYPE_WIDTH = `FLIT16_TYPE_WIDTH;
    localparam DBG_NOC_FLIT_WIDTH = DBG_NOC_DATA_WIDTH + DBG_NOC_FLIT_TYPE_WIDTH;
    parameter DBG_NOC_VCHANNELS = 1;
-	parameter DBG_NOC_TRACE_VCHANNEL = 0;
+   parameter DBG_NOC_TRACE_VCHANNEL = 0;
    parameter DBG_NOC_CONF_VCHANNEL = 0;
    
    input clk, rst;
-
+   /* interface to global timestamp provider module */
+   input [`DIAGNOSIS_TIMESTAMP_WIDTH-1:0] time_global;
+   /* Execution traceport in a single signal */
+   input mor1kx_trace_exec trace_port;
+   /* Debug NoC interface */
+   input [DBG_NOC_FLIT_WIDTH-1:0]     dbgnoc_in_flit;
+   input [DBG_NOC_VCHANNELS-1:0]      dbgnoc_in_valid;
+   output [DBG_NOC_VCHANNELS-1:0]     dbgnoc_in_ready;
+   output [DBG_NOC_FLIT_WIDTH-1:0]    dbgnoc_out_flit;
+   output [DBG_NOC_VCHANNELS-1:0]     dbgnoc_out_valid;
+   input [DBG_NOC_VCHANNELS-1:0]      dbgnoc_out_ready;
+   /* Configuration of Events */
+   input [3*16*`DIAGNOSIS_PC_EVENTS_MAX*2-1:0] conf_mem;
+   
    /* mor1kx program counter interface */
    wire [31:0] pc_val;
    wire        pc_enable;
-
    /* mor1kx writeback register interface */
    wire        wb_enable;
    wire [`DIAGNOSIS_WB_REG_WIDTH-1:0] wb_reg;
    wire [`DIAGNOSIS_WB_DATA_WIDTH-1:0] wb_data;
-
-
    /* mor1kx instruction trace interface */
-   wire [31:0]                         trace_insn;
-   wire                                trace_enable;
+   wire [31:0] trace_insn;
+   wire        trace_enable;
 
-   /* interface to global timestamp provider module */
-   input [`DIAGNOSIS_TIMESTAMP_WIDTH-1:0] time_global;
+   assign pc_val = trace_port.pc;
+   assign pc_enable = trace_port.valid;
+   assign wb_enable = trace_port.wben;
+   assign wb_reg = trace_port.wbreg;
+   assign wb_data = trace_port.wbdata;
+   assign trace_insn = trace_port.insn;
+   assign trace_enable = trace_port.valid;
 
-   /* Execution traceport in a single signal */
-   input [`DEBUG_TRACE_EXEC_WIDTH-1:0]    traceport_flat;
-   assign pc_val = traceport_flat[`DEBUG_TRACE_EXEC_PC_MSB:`DEBUG_TRACE_EXEC_PC_LSB];
-   assign pc_enable = traceport_flat[`DEBUG_TRACE_EXEC_ENABLE_MSB:`DEBUG_TRACE_EXEC_ENABLE_LSB];
-   assign wb_enable = traceport_flat[`DEBUG_TRACE_EXEC_WBEN_MSB:`DEBUG_TRACE_EXEC_WBEN_LSB];
-   assign wb_reg = traceport_flat[`DEBUG_TRACE_EXEC_WBREG_MSB:`DEBUG_TRACE_EXEC_WBREG_LSB];
-   assign wb_data = traceport_flat[`DEBUG_TRACE_EXEC_WBDATA_MSB:`DEBUG_TRACE_EXEC_WBDATA_LSB];
-   assign trace_insn = traceport_flat[`DEBUG_TRACE_EXEC_INSN_MSB:`DEBUG_TRACE_EXEC_INSN_LSB];
-   assign trace_enable = traceport_flat[`DEBUG_TRACE_EXEC_ENABLE_MSB:`DEBUG_TRACE_EXEC_ENABLE_LSB];
-
-   /* Debug NoC interface */
-   input [DBG_NOC_FLIT_WIDTH-1:0]         dbgnoc_in_flit;
-   input [DBG_NOC_VCHANNELS-1:0]          dbgnoc_in_valid;
-   output [DBG_NOC_VCHANNELS-1:0]         dbgnoc_in_ready;
-   output [DBG_NOC_FLIT_WIDTH-1:0]    dbgnoc_out_flit;
-   output [DBG_NOC_VCHANNELS-1:0]     dbgnoc_out_valid;
-   input [DBG_NOC_VCHANNELS-1:0]          dbgnoc_out_ready;
-//
-   input [3*16*`DIAGNOSIS_PC_EVENTS_MAX*2-1:0] conf_mem;
-// 
-   
    /*AUTOWIRE*/
    // Beginning of automatic wires (for undeclared instantiated-module outputs)
    wire [31:0]          bv_GPR;                 // From u_LUT of LUT.v
