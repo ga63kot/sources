@@ -5,6 +5,7 @@ depend =
   opensocdebug:modules:system_diagnosis
   optimsoc:lisnoc:lisnoc16
   optimsoc:lisnoc:lisnoc16_converter
+  opensocdebug:blocks:tracepacket
 
 [fileset src_files]
 file_type = verilogSource
