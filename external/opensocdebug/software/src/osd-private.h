@@ -47,6 +47,7 @@ struct osd_module_info {
         struct osd_memory_descriptor *memory;
         struct osd_stm_descriptor *stm;
         struct osd_ctm_descriptor *ctm;
+        struct osd_system_diagnosis_descriptor *system_diagnosis;
     } descriptor;
 };
 
