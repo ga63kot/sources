@@ -264,6 +264,8 @@ static int interpret(struct osd_context *ctx, char *line) {
             PRINT_HELP(confreg);
         } else if (CHECK_MATCH(subcmd, "test")) {
             write_configreg(ctx);
+            printf("Generate System Diagosis Log\n");
+	    osd_system_diagnosis_log(ctx, 5, "/home/ga63kot/src2/baremetal-apps/hello/system_diagnosis.log");	    
         }
     } else {
         fprintf(stderr, "Unknown command: %s\n", cmd);
