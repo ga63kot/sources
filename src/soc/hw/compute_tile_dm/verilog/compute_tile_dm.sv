@@ -325,9 +325,9 @@ module compute_tile_dm
          	.debug_out_ready (dii_in_ready[1 + c*CONFIG.DEBUG_MODS_PER_CORE + 2]),
          	// System Interface
 		.trace_port (trace[c]),
-         	.wb_adr_i                   (wb_mem_adr_i),
-        	.wb_sel_i                   (wb_mem_sel_i),
-        	.wb_we_i                    (wb_mem_we_i));
+         	.sram_addr (wb_mem_adr_i),
+        	.sram_ce (1'b1),
+        	.sram_we (wb_mem_we_i));
 
          end
       end
