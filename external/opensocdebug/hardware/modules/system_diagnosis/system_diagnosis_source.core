@@ -12,10 +12,7 @@ file_type = verilogSource
 usage = sim synth
 files =
   common/source/comparator_module.v
-  common/source/diagnosis_system_M.v
-  common/source/diagnosis_system_PR.v
-  common/source/diagnosis_system_PRM.v
-  common/source/diagnosis_system_P_without_snapshot.v
+  common/source/diagnosis_system.v
   common/source/fcnreturn_monitor.v
   common/source/GPR.v
   common/source/lifo.v

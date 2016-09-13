@@ -4,13 +4,6 @@
  (program counter, writeback signal etc.) and a debug-NoC
  interface for system configuration and output of 
  snapshot packets.
- The letters at the end of the module name stand for the
- monitor modules that are included. In this system, there
- are available:
- P: Program counter monitor
- R: Function return monitor
- M: Memory address monitor
- (This covers all currently available modules)
  
  Author: Markus Goehrle, <Markus.Goehrle@tum.de>
  */
@@ -20,14 +13,13 @@
 `include "lisnoc_def.vh"
 `include "lisnoc16_def.vh"
 
-module diagnosis_system_PRM(/*AUTOARG*/
+module diagnosis_system(/*AUTOARG*/
    // Outputs
    dbgnoc_in_ready, dbgnoc_out_flit, dbgnoc_out_valid,
    // Inputs
-   clk, rst, memaddr_val, sram_ce, sram_we, time_global,
-   traceport_flat, dbgnoc_in_flit, dbgnoc_in_valid, dbgnoc_out_ready
+   clk, rst, memaddr_val, sram_ce, sram_we, time_global, trace_port, 
+   dbgnoc_in_flit, dbgnoc_in_valid, dbgnoc_out_ready, conf_mem
    );
-
 
    /** Configuration memory: 16 bit flits **/
    /** We have currently 3 x 16 bit flits for one config entry (including valid flag).
@@ -41,10 +33,9 @@ module diagnosis_system_PRM(/*AUTOARG*/
    localparam CONF_MEMADDR_SIZE = `DIAGNOSIS_MEMADDR_EVENTS_MAX * CONF_FLITS_PER_ENTRY;
    localparam CONF_LUT_SIZE = `DIAGNOSIS_TOTAL_EVENTS_MAX * CONF_FLITS_PER_ENTRY;
   
-
-   /* Core ID */
+ /* Core ID */
    parameter CORE_ID = 16'hx;
-   
+    
    /** Debug NoC Parameters **/
    parameter DBG_NOC_DATA_WIDTH = `FLIT16_CONTENT_WIDTH;
    parameter DBG_NOC_FLIT_TYPE_WIDTH = `FLIT16_TYPE_WIDTH;
@@ -52,48 +43,43 @@ module diagnosis_system_PRM(/*AUTOARG*/
    parameter DBG_NOC_VCHANNELS = 1;
    
    input clk, rst;
-
-   /* mor1kx program counter interface */
-   wire [31:0] pc_val;
-   wire        pc_enable;
-
-   /* mor1kx writeback register interface */
-   wire        wb_enable;
-   wire [`DIAGNOSIS_WB_REG_WIDTH-1:0] wb_reg;
-   wire [`DIAGNOSIS_WB_DATA_WIDTH-1:0] wb_data;
-
    /* Memory interface */
    input [31:0]                         memaddr_val;
    input                                sram_ce; // chip enable
    input                                sram_we; // write enable
-
-   /* mor1kx instruction trace interface */
-   wire [31:0]                         trace_insn;
-   wire                                trace_enable;
-
    /* interface to global timestamp provider module */
    input [`DIAGNOSIS_TIMESTAMP_WIDTH-1:0] time_global;
-
    /* Execution traceport in a single signal */
-   input [`DEBUG_TRACE_EXEC_WIDTH-1:0]    traceport_flat;
-   assign pc_val = traceport_flat[`DEBUG_TRACE_EXEC_PC_MSB:`DEBUG_TRACE_EXEC_PC_LSB];
-   assign pc_enable = traceport_flat[`DEBUG_TRACE_EXEC_ENABLE_MSB:`DEBUG_TRACE_EXEC_ENABLE_LSB];
-   assign wb_enable = traceport_flat[`DEBUG_TRACE_EXEC_WBEN_MSB:`DEBUG_TRACE_EXEC_WBEN_LSB];
-   assign wb_reg = traceport_flat[`DEBUG_TRACE_EXEC_WBREG_MSB:`DEBUG_TRACE_EXEC_WBREG_LSB];
-   assign wb_data = traceport_flat[`DEBUG_TRACE_EXEC_WBDATA_MSB:`DEBUG_TRACE_EXEC_WBDATA_LSB];
-   assign trace_insn = traceport_flat[`DEBUG_TRACE_EXEC_INSN_MSB:`DEBUG_TRACE_EXEC_INSN_LSB];
-   assign trace_enable = traceport_flat[`DEBUG_TRACE_EXEC_ENABLE_MSB:`DEBUG_TRACE_EXEC_ENABLE_LSB];
-
+   input mor1kx_trace_exec trace_port;
    /* Debug NoC interface */
-   input [DBG_NOC_FLIT_WIDTH-1:0]         dbgnoc_in_flit;
-   input [DBG_NOC_VCHANNELS-1:0]          dbgnoc_in_valid;
-   output [DBG_NOC_VCHANNELS-1:0]         dbgnoc_in_ready;
+   input [DBG_NOC_FLIT_WIDTH-1:0]     dbgnoc_in_flit;
+   input [DBG_NOC_VCHANNELS-1:0]      dbgnoc_in_valid;
+   output [DBG_NOC_VCHANNELS-1:0]     dbgnoc_in_ready;
    output [DBG_NOC_FLIT_WIDTH-1:0]    dbgnoc_out_flit;
    output [DBG_NOC_VCHANNELS-1:0]     dbgnoc_out_valid;
-   input [DBG_NOC_VCHANNELS-1:0]          dbgnoc_out_ready;
-
- 
+   input [DBG_NOC_VCHANNELS-1:0]      dbgnoc_out_ready;
+   /* Configuration of Events */
+   input [3*16*`DIAGNOSIS_TOTAL_EVENTS_MAX*2-1:0] conf_mem;
    
+   /* mor1kx program counter interface */
+   wire [31:0] pc_val;
+   wire        pc_enable;
+   /* mor1kx writeback register interface */
+   wire        wb_enable;
+   wire [`DIAGNOSIS_WB_REG_WIDTH-1:0] wb_reg;
+   wire [`DIAGNOSIS_WB_DATA_WIDTH-1:0] wb_data;
+   /* mor1kx instruction trace interface */
+   wire [31:0] trace_insn;
+   wire        trace_enable;
+
+   assign pc_val = trace_port.pc;
+   assign pc_enable = trace_port.valid;
+   assign wb_enable = trace_port.wben;
+   assign wb_reg = trace_port.wbreg;
+   assign wb_data = trace_port.wbdata;
+   assign trace_insn = trace_port.insn;
+   assign trace_enable = trace_port.valid;
+
    /*AUTOWIRE*/
    // Beginning of automatic wires (for undeclared instantiated-module outputs)
    wire [31:0]          bv_GPR;                 // From u_LUT of LUT.v
@@ -123,11 +109,14 @@ module diagnosis_system_PRM(/*AUTOARG*/
    wire [5:0]           stackargs;              // From u_LUT of LUT.v
    // End of automatics
 
+
    /*** Wiring of configuration registers that are stored in the packetizer module ***/
    localparam CONF_DISCOVERY_SIZE = 31; // The first two config flits are for CPUID and Module Type
    localparam CONF_SYSTEMONOFF_LSB = CONF_DISCOVERY_SIZE + 1;
-   localparam CONF_SYSTEMONOFF_MSB = CONF_SYSTEMONOFF_LSB + 16 - 1;
-   localparam CONF_PC_LSB = CONF_SYSTEMONOFF_MSB + 1;
+//   localparam CONF_SYSTEMONOFF_MSB = CONF_SYSTEMONOFF_LSB + 16 - 1;
+   localparam CONF_SYSTEMONOFF_MSB = 0;
+//   localparam CONF_PC_LSB = CONF_SYSTEMONOFF_MSB + 1;
+   localparam CONF_PC_LSB = CONF_SYSTEMONOFF_MSB;
    localparam CONF_PC_MSB = CONF_PC_LSB + 16*CONF_PC_SIZE - 1;
    localparam CONF_FCNRET_LSB = CONF_PC_MSB + 1;
    localparam CONF_FCNRET_MSB = CONF_FCNRET_LSB + 16*CONF_FCNRET_SIZE - 1;
@@ -142,11 +131,11 @@ module diagnosis_system_PRM(/*AUTOARG*/
    wire [16*CONF_MEMADDR_SIZE-1:0] conf_memaddr_flat_in;
    wire [16*CONF_LUT_SIZE-1:0]     conf_lut_flat_in;
 
-   assign diag_sys_enabled = conf_mem_flat_out[CONF_SYSTEMONOFF_LSB];
-   assign conf_pc_flat_in = conf_mem_flat_out[CONF_PC_MSB:CONF_PC_LSB];
-   assign conf_fcnret_flat_in = conf_mem_flat_out[CONF_FCNRET_MSB:CONF_FCNRET_LSB];
-   assign conf_memaddr_flat_in = conf_mem_flat_out[CONF_MEMADDR_MSB:CONF_MEMADDR_LSB];
-   assign conf_lut_flat_in = conf_mem_flat_out[CONF_LUT_MSB:CONF_LUT_LSB];
+   assign diag_sys_enabled = conf_mem[CONF_SYSTEMONOFF_LSB];
+   assign conf_pc_flat_in = conf_mem[CONF_PC_MSB:CONF_PC_LSB];
+   assign conf_fcnret_flat_in = conf_mem[CONF_FCNRET_MSB:CONF_FCNRET_LSB];
+   assign conf_memaddr_flat_in = conf_mem[CONF_MEMADDR_MSB:CONF_MEMADDR_LSB];
+   assign conf_lut_flat_in = conf_mem[CONF_LUT_MSB:CONF_LUT_LSB];
 
    
    PC_monitor
@@ -223,18 +212,11 @@ module diagnosis_system_PRM(/*AUTOARG*/
            .memaddr_ev_valid            (memaddr_ev_valid),
            .memaddr_ev_id               (memaddr_ev_id[`DIAGNOSIS_EV_ID_WIDTH-1:0]),
            .memaddr_ev_time             (memaddr_ev_time[`DIAGNOSIS_TIMESTAMP_WIDTH-1:0]));
-
-/* Packetizer AUTO_TEMPLATE(
-    .in_GPR_\(.*\) (out_GPR_\1[]),
-    .in_stack_\(.*\) (out_stack_\1[]),
- 
-    );*/
    
    Packetizer
-      #(.DBG_NOC_VCHANNELS(DBG_NOC_VCHANNELS),
+     #(.DBG_NOC_VCHANNELS(DBG_NOC_VCHANNELS),
         .CONF_MEM_SIZE(CONF_MEM_SIZE),
-        .CORE_ID(CORE_ID)
-)
+        .CORE_ID(CORE_ID))
      u_packetizer(/*AUTOINST*/
                   // Outputs
                   .conf_mem_flat_out    (conf_mem_flat_out[CONF_MEM_SIZE*16-1:0]),
@@ -259,11 +241,6 @@ module diagnosis_system_PRM(/*AUTOARG*/
                   .dbgnoc_in_valid      (dbgnoc_in_valid[DBG_NOC_VCHANNELS-1:0]),
                   .dbgnoc_out_ready     (dbgnoc_out_ready[DBG_NOC_VCHANNELS-1:0]));
 
-
-   /* GPR AUTO_TEMPLATE(
-    .stackarg_addr_i (gpr_addr_o),
-    .bv_valid     (event_valid_global),
-    );*/
    GPR
      u_GPR(/*AUTOINST*/
            // Outputs
@@ -278,15 +255,10 @@ module diagnosis_system_PRM(/*AUTOARG*/
            .wb_reg                      (wb_reg[`DIAGNOSIS_WB_REG_WIDTH-1:0]),
            .wb_data                     (wb_data[`DIAGNOSIS_WB_DATA_WIDTH-1:0]),
            .bv_GPR                      (bv_GPR[31:0]),
-           .bv_valid                    (event_valid_global),    // Templated
+           .bv_valid                    (event_valid_global),
            .out_GPR_rdy                 (out_GPR_rdy),
-           .stackarg_addr_i             (gpr_addr_o));            // Templated
+           .stackarg_addr_i             (gpr_addr_o));
 
-   /* Stack AUTO_TEMPLATE(
-    .gpr_data_i (stackarg_data_o),
-    .args_valid (event_valid_global),
-    .args_in (stackargs),
-    );*/
    Stack
      u_stack(/*AUTOINST*/
              // Outputs
@@ -299,19 +271,9 @@ module diagnosis_system_PRM(/*AUTOARG*/
              .rst                       (rst),
              .trace_insn                (trace_insn[31:0]),
              .trace_enable              (trace_enable),
-             .args_in                   (stackargs),             // Templated
-             .args_valid                (event_valid_global),    // Templated
-             .gpr_data_i                (stackarg_data_o),       // Templated
+             .args_in                   (stackargs),
+             .args_valid                (event_valid_global),
+             .gpr_data_i                (stackarg_data_o),
              .out_stack_rdy             (out_stack_rdy));
-/*
- trafficmonitor
-     u_trafficmonitor(
-                      // Inputs
-                      .clk              (clk),
-                      .rst              (rst),
-                      .ev_counter (),
-                      .event_global     (event_valid_global),
-                      .flit_valid       (dbgnoc_out_valid[0]));//1?
-*/
-   
+
    endmodule

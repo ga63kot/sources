@@ -53,8 +53,7 @@
 ///*** LUT Module **************************************************************
 // Total maximum number of simultaneously tracked events in the system
 // This is always the sum of the maximum events of each monitor
-//`define DIAGNOSIS_TOTAL_EVENTS_MAX (`DIAGNOSIS_PC_EVENTS_MAX + `DIAGNOSIS_MEMADDR_EVENTS_MAX + `DIAGNOSIS_FCNRET_EVENTS_MAX)
-`define DIAGNOSIS_TOTAL_EVENTS_MAX (`DIAGNOSIS_PC_EVENTS_MAX)
+`define DIAGNOSIS_TOTAL_EVENTS_MAX (`DIAGNOSIS_PC_EVENTS_MAX + `DIAGNOSIS_MEMADDR_EVENTS_MAX + `DIAGNOSIS_FCNRET_EVENTS_MAX)
 
 ///*** GPR Module *************************************************************
 // Write back interface bit widths

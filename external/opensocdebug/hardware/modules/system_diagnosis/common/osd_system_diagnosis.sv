@@ -14,9 +14,9 @@ module osd_system_diagnosis
    	output dii_flit debug_out, input debug_out_ready,
    	/* System Interface */
    	input mor1kx_trace_exec trace_port,
-   	input [32-1:0]  wb_adr_i,
-   	input [4-1:0]   wb_sel_i,
-   	input           wb_we_i);
+   	input [32-1:0]  sram_addr,
+   	input [4-1:0]   sram_ce,
+   	input           sram_we);
 
    logic        reg_request;
    logic        reg_write;
@@ -26,8 +26,8 @@ module osd_system_diagnosis
    logic        reg_ack;
    logic        reg_err;
    logic [15:0] reg_rdata;
-   logic [15:0] config_reg [`DIAGNOSIS_CONF_FLITS_PER_ENTRY*`DIAGNOSIS_PC_EVENTS_MAX*2-1:0];
-   logic [`DIAGNOSIS_CONF_FLITS_PER_ENTRY*16*`DIAGNOSIS_PC_EVENTS_MAX*2-1:0] conf_mem;
+   logic [15:0] config_reg [`DIAGNOSIS_CONF_FLITS_PER_ENTRY*`DIAGNOSIS_TOTAL_EVENTS_MAX*2-1:0];
+   logic [`DIAGNOSIS_CONF_FLITS_PER_ENTRY*16*`DIAGNOSIS_TOTAL_EVENTS_MAX*2-1:0] conf_mem;
    logic [`DIAGNOSIS_TIMESTAMP_WIDTH-1:0] timestamp;
 
    dii_flit 	dp_out, dp_in;
@@ -71,7 +71,7 @@ module osd_system_diagnosis
        if (reg_request & reg_write & (reg_addr >= 16'h200))
          config_reg[reg_addr-16'h200] <= reg_wdata;
 
-   for (genvar i = 0 ; i <= `DIAGNOSIS_CONF_FLITS_PER_ENTRY*`DIAGNOSIS_PC_EVENTS_MAX*2; i = i + 1) begin
+   for (genvar i = 0 ; i <= `DIAGNOSIS_CONF_FLITS_PER_ENTRY*`DIAGNOSIS_TOTAL_EVENTS_MAX*2; i = i + 1) begin
    	assign conf_mem[16*i+15:16*i] = config_reg[i];
    end 
 
@@ -85,11 +85,14 @@ module osd_system_diagnosis
         .timestamp (timestamp));
 
    /* System Diagnosis Module Implementation */
-   diagnosis_system_P_without_snapshot
-   u_diagnosis_system_P_without_snapshot(
+   diagnosis_system
+   u_diagnosis_system(
 	// Inputs	
 	.clk (clk),
 	.rst (rst),
+        .memaddr_val (sram_addr),
+        .sram_ce (sram_ce),
+        .sram_we (sram_we),
 	.time_global (timestamp),
 	.trace_port (trace_port),
 	.dbgnoc_in_flit (dp_in),
