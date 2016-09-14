@@ -28,7 +28,7 @@ the same license as the original.
 
 ## Authors
 
-Tim Fritzmann, Markus Göhrle
+Tim Fritzmann
 
 # System Interface
 
@@ -245,12 +245,10 @@ With the six bits for the stack arguments the number of word lines can be chosen
 
 # Trace Packets
 
-The trace packets were sent over the Debug NoC to the host.
-The sequence starts with a common header and ends with the tail:
+The trace packets were sent over the Debug NoC to the host:
 
  Type     | Content
  -------  | -------
- Header   | `[15]`: R/W, `[14]`: Single/Chunk, `[13:0]`: Strobe/Chunk size
  Content  | `[15:6]`: undefined, `[5:0]`: EVENT ID
  Content  | `[15:0]`: TIMESTAMP_LSB
  Content  | `[15:0]`: TIMESTAMP_MSB
@@ -259,4 +257,3 @@ The sequence starts with a common header and ends with the tail:
  ..       | ..
  Content  | `[15:0]`: STACKARG DATA LSB
  Content  | `[15:0]`: STACKARG DATA MSB
- Tail     | `[15:0]`: Address
