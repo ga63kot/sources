@@ -59,7 +59,7 @@ module diagnosis_system(/*AUTOARG*/
    output [DBG_NOC_VCHANNELS-1:0]     dbgnoc_out_valid;
    input [DBG_NOC_VCHANNELS-1:0]      dbgnoc_out_ready;
    /* Configuration of Events */
-   input [3*16*`DIAGNOSIS_TOTAL_EVENTS_MAX*2-1:0] conf_mem;
+   input [3*16*`DIAGNOSIS_TOTAL_EVENTS_MAX*2:0] conf_mem;
    
    /* mor1kx program counter interface */
    wire [31:0] pc_val;
@@ -111,12 +111,9 @@ module diagnosis_system(/*AUTOARG*/
 
 
    /*** Wiring of configuration registers that are stored in the packetizer module ***/
-   localparam CONF_DISCOVERY_SIZE = 31; // The first two config flits are for CPUID and Module Type
-   localparam CONF_SYSTEMONOFF_LSB = CONF_DISCOVERY_SIZE + 1;
-//   localparam CONF_SYSTEMONOFF_MSB = CONF_SYSTEMONOFF_LSB + 16 - 1;
-   localparam CONF_SYSTEMONOFF_MSB = 0;
-//   localparam CONF_PC_LSB = CONF_SYSTEMONOFF_MSB + 1;
-   localparam CONF_PC_LSB = CONF_SYSTEMONOFF_MSB;
+   localparam CONF_SYSTEMONOFF_LSB = 0;
+   localparam CONF_SYSTEMONOFF_MSB = 15;
+   localparam CONF_PC_LSB = CONF_SYSTEMONOFF_MSB + 1;
    localparam CONF_PC_MSB = CONF_PC_LSB + 16*CONF_PC_SIZE - 1;
    localparam CONF_FCNRET_LSB = CONF_PC_MSB + 1;
    localparam CONF_FCNRET_MSB = CONF_FCNRET_LSB + 16*CONF_FCNRET_SIZE - 1;
