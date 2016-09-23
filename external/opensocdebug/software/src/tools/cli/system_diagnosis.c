@@ -34,7 +34,7 @@ int write_configreg(struct osd_context *ctx) {
 
     osd_reg_write16(ctx, 5, 0x200, 0x0001);		// System On/Off
 
-    osd_reg_write16(ctx, 5, 0x201, 0x2030);		// First PC Event LSB
+    osd_reg_write16(ctx, 5, 0x201, 0x2540);		// First PC Event LSB
     osd_reg_write16(ctx, 5, 0x202, 0x0000);		// First PC Event MSB
     osd_reg_write16(ctx, 5, 0x203, 0x8001);		// First PC Event valid and Event ID 1
 
@@ -42,45 +42,45 @@ int write_configreg(struct osd_context *ctx) {
     osd_reg_write16(ctx, 5, 0x205, 0x0000);		// Second PC Event MSB
     osd_reg_write16(ctx, 5, 0x206, 0x8002);		// Second PC Event valid and Event ID 2
 
-    osd_reg_write16(ctx, 5, 0x207, 0xd334);		// Third PC Event LSB
+    osd_reg_write16(ctx, 5, 0x207, 0x0000);		// Third PC Event LSB
     osd_reg_write16(ctx, 5, 0x208, 0x0000);		// Third PC Event MSB
     osd_reg_write16(ctx, 5, 0x209, 0x8003);		// Third PC Event valid and Event ID 3
 
-    osd_reg_write16(ctx, 5, 0x20a, 0x2088);		// First Function Return Event LSB
+    osd_reg_write16(ctx, 5, 0x20a, 0x2540);		// First Function Return Event LSB
     osd_reg_write16(ctx, 5, 0x20b, 0x0000);		// First Function Return Event MSB
     osd_reg_write16(ctx, 5, 0x20c, 0x8004);		// First Function Return Event valid and Event ID 4
 
-    osd_reg_write16(ctx, 5, 0x20d, 0xA964);		// Second Function Return Event LSB
+    osd_reg_write16(ctx, 5, 0x20d, 0x0000);		// Second Function Return Event LSB
     osd_reg_write16(ctx, 5, 0x20e, 0x0000);		// Second Function Return Event MSB
-    osd_reg_write16(ctx, 5, 0x20f, 0x8005);		// Second Function Return Event valid and Event ID 5
+    osd_reg_write16(ctx, 5, 0x20f, 0x80c5);		// Second Function Return Event valid and Event ID 5
  
-    osd_reg_write16(ctx, 5, 0x210, 0xe938);		// First Memaddr Monitor Event LSB
+    osd_reg_write16(ctx, 5, 0x210, 0x0000);		// First Memaddr Monitor Event LSB
     osd_reg_write16(ctx, 5, 0x211, 0x0000);		// First Memaddr Monitor Event MSB
     osd_reg_write16(ctx, 5, 0x212, 0x8006);		// First Memaddr Monitor Event valid and Event ID 6
 
-    osd_reg_write16(ctx, 5, 0x213, 0x0000);		// Configuration GPR selection vector LSB
+    osd_reg_write16(ctx, 5, 0x213, 0x03f8);		// Configuration GPR selection vector LSB		// R3, R4, R5, R6, R7, R8, R9 (arg values 1-6 and function return address)
     osd_reg_write16(ctx, 5, 0x214, 0x0000);		// Configuration GPR selection vector MSB
-    osd_reg_write16(ctx, 5, 0x215, 0x8001);		// Configuration First Event valid and Event ID 1
+    osd_reg_write16(ctx, 5, 0x215, 0x80c1);		// Configuration First Event valid and Event ID 1	// stack values 1, 2, 3 (arg values 7-9)
 
-    osd_reg_write16(ctx, 5, 0x216, 0xffff);		// Configuration GPR selection vector LSB
+    osd_reg_write16(ctx, 5, 0x216, 0x0000);		// Configuration GPR selection vector LSB
     osd_reg_write16(ctx, 5, 0x217, 0x0000);		// Configuration GPR selection vector MSB
-    osd_reg_write16(ctx, 5, 0x218, 0x8fc2);		// Configuration Second Event valid and Event ID 2
+    osd_reg_write16(ctx, 5, 0x218, 0x8002);		// Configuration Second Event valid and Event ID 2
 
-    osd_reg_write16(ctx, 5, 0x219, 0xffff);		// Configuration GPR selection vector LSB
+    osd_reg_write16(ctx, 5, 0x219, 0x0000);		// Configuration GPR selection vector LSB
     osd_reg_write16(ctx, 5, 0x21a, 0x0000);		// Configuration GPR selection vector MSB
-    osd_reg_write16(ctx, 5, 0x21b, 0x80c3);		// Configuration Third Event valid and Event ID 3
+    osd_reg_write16(ctx, 5, 0x21b, 0x8003);		// Configuration Third Event valid and Event ID 3
 
-    osd_reg_write16(ctx, 5, 0x21c, 0xffff);		// Configuration GPR selection vector LSB
+    osd_reg_write16(ctx, 5, 0x21c, 0x0800);		// Configuration GPR selection vector LSB		// R11 (return value)
     osd_reg_write16(ctx, 5, 0x21d, 0x0000);		// Configuration GPR selection vector MSB
-    osd_reg_write16(ctx, 5, 0x21e, 0x8fc4);		// Configuration Fourth Event valid and Event ID 4
+    osd_reg_write16(ctx, 5, 0x21e, 0x8004);		// Configuration Fourth Event valid and Event ID 4
 
-    osd_reg_write16(ctx, 5, 0x21f, 0xffff);		// Configuration GPR selection vector LSB
+    osd_reg_write16(ctx, 5, 0x21f, 0x0000);		// Configuration GPR selection vector LSB
     osd_reg_write16(ctx, 5, 0x220, 0x0000);		// Configuration GPR selection vector MSB
-    osd_reg_write16(ctx, 5, 0x221, 0x80c5);		// Configuration Fifth Event valid and Event ID 5
+    osd_reg_write16(ctx, 5, 0x221, 0x8005);		// Configuration Fifth Event valid and Event ID 5
 
-    osd_reg_write16(ctx, 5, 0x222, 0xffff);		// Configuration GPR selection vector LSB
+    osd_reg_write16(ctx, 5, 0x222, 0x0000);		// Configuration GPR selection vector LSB
     osd_reg_write16(ctx, 5, 0x223, 0x0000);		// Configuration GPR selection vector MSB
-    osd_reg_write16(ctx, 5, 0x224, 0x80c6);		// Configuration Fifth Event valid and Event ID 6
+    osd_reg_write16(ctx, 5, 0x224, 0x8006);		// Configuration Fifth Event valid and Event ID 6
 
     return success;
 }
