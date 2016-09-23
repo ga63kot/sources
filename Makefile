@@ -27,11 +27,8 @@ version := $(shell tools/get-version.sh)
 OBJDIR := objdir
 
 # Build configuration
-# Build and package the compiled examples (yes/no)
+# Build and package the examples (yes/no)
 BUILD_EXAMPLES := yes
-# Include FPGA bitstreams in the examples (yes/no)
-# Requires Xilinx Vivado to be installed
-BUILD_EXAMPLES_FPGA := yes
 # Build documentation (yes/no)
 BUILD_DOCS := yes
 
@@ -46,20 +43,11 @@ INSTALL_TARGET := $(INSTALL_PREFIX)/$(version)
 
 # Assemble arguments passed to tools/build.py
 BUILD_ARGS = ''
-ifeq ($(BUILD_DOCS),yes)
-	BUILD_ARGS += '--with-docs'
-else
-	BUILD_ARGS += '--without-docs'
+ifneq ($(BUILD_EXAMPLES),yes)
+	BUILD_ARGS += '--no-examples'
 endif
-ifeq ($(BUILD_EXAMPLES),yes)
-	BUILD_ARGS += '--with-examples-sim'
-else
-	BUILD_ARGS += '--without-examples-sim'
-endif
-ifeq ($(BUILD_EXAMPLES_FPGA),yes)
-	BUILD_ARGS += '--with-examples-fpga'
-else
-	BUILD_ARGS += '--without-examples-fpga'
+ifneq ($(BUILD_DOCS),yes)
+	BUILD_ARGS += '--no-doc'
 endif
 
 build:
@@ -69,25 +57,25 @@ install: build
 	mkdir -p $(INSTALL_TARGET)
 	cp -rT $(OBJDIR)/dist $(INSTALL_TARGET)
 
-dist:
+dist: build
 	tar -cz --directory $(OBJDIR) --exclude examples \
 		--transform "s/dist/$(version)/" \
 		-f $(OBJDIR)/optimsoc-$(version)-base.tar.gz dist
 
-ifeq ($(BUILD_EXAMPLES),yes)
-	tar -cz --directory $(OBJDIR) \
-		--transform "s/dist/$(version)/" \
-		-f $(OBJDIR)/optimsoc-$(version)-examples.tar.gz dist/examples
-endif
+	ifeq ($(BUILD_EXAMPLES),yes)
+		tar -cz --directory $(OBJDIR) \
+			--transform "s/dist/$(version)/" \
+			-f $(OBJDIR)/optimsoc-$(version)-examples.tar.gz dist/examples
+	endif
 
 	@echo
 	@echo The binary distribution packages have been written to
 	@echo $(OBJDIR)/optimsoc-$(version)-base.tar.gz
 
-ifeq ($(BUILD_EXAMPLES),yes)
-	@echo The examples have been written to
-	@echo $(OBJDIR)/optimsoc-$(version)-examples.tar.gz
-endif
+	ifeq ($(BUILD_EXAMPLES),yes)
+		@echo The examples have been written to
+		@echo $(OBJDIR)/optimsoc-$(version)-examples.tar.gz
+	endif
 
 clean:
 	rm -rf $(OBJDIR)

@@ -157,7 +157,8 @@ module Packetizer (/*AUTOARG*/
 
 //// NEW PACKETIZER
   osd_trace_packetization
-    #(.WIDTH(34))
+    #(.WIDTH(34),
+      .DEST_ID (6))
   u_trace_packetization
      (
       .clk (clk),
