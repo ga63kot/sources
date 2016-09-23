@@ -176,7 +176,7 @@ static void system_diagnosis_log_handler(struct osd_context *ctx, void* arg, uin
    } else if (((id == 0) & (prev_id == 0)) || ((id == 2) & (prev_id == 0))) {     	
 	counter ++;	
 	gpr_stack_data = (packet[4] << 16) | packet[3];
-	fprintf(fh, "GPR/Stack Data %d: %08x\n", counter, gpr_stack_data);
+	fprintf(fh, "GPR/Stack Data %d: %08x\n", counter-1, gpr_stack_data);
    }
 
    prev_id = packet[5];
