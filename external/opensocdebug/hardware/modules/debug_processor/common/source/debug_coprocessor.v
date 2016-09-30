@@ -194,7 +194,7 @@ module debug_coprocessor(
           .trace          (trace[`DEBUG_TRACE_EXEC_WIDTH*(c+1)-1:`DEBUG_TRACE_EXEC_WIDTH*c]),
           ); */
          mor1kx_module
-               #(.ID(c))
+               #(.ID(1))
          u_core (
                  /*AUTOINST*/
                  // Outputs
@@ -482,7 +482,7 @@ module debug_coprocessor(
     .wbm_\(.*\)      (busms_\1[NR_MASTERS-1]),
     .irq    (na_irq),
     );*/
-/*   na_conf_wb
+   na_conf_wb
       #(.TILEID(ID),
         .NUMCORES(CORES), .COREBASE(COREBASE),
         .DOMAIN_NUMCORES(DOMAIN_NUMCORES),
@@ -497,7 +497,7 @@ module debug_coprocessor(
  `endif
 `endif
            /*AUTOINST*/
-/*           // Outputs
+           // Outputs
            .wbs_ack_o                   (bussl_ack_o[1]),        // Templated
            .wbs_rty_o                   (bussl_rty_o[1]),        // Templated
            .wbs_err_o                   (bussl_err_o[1]),        // Templated
@@ -514,7 +514,7 @@ module debug_coprocessor(
            .wbs_cab_i                   (bussl_cab_i[1]),        // Templated
            .wbs_cti_i                   (bussl_cti_i[1]),        // Templated
            .wbs_bte_i                   (bussl_bte_i[1]));       // Templated
-*/
+
 
 	wire [`DEBUG_TRACE_EXEC_WIDTH*CORES-1:0] trace;
 
