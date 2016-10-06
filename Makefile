@@ -27,14 +27,11 @@ version := $(shell tools/get-version.sh)
 OBJDIR := objdir
 
 # Build configuration
-# Build and package the examples (yes/no)
+# Build and package the compiled examples (yes/no)
 BUILD_EXAMPLES := yes
-<<<<<<< HEAD
-=======
 # Include FPGA bitstreams in the examples (yes/no)
 # Requires Xilinx Vivado to be installed
 BUILD_EXAMPLES_FPGA := yes
->>>>>>> upstream/master
 # Build documentation (yes/no)
 BUILD_DOCS := yes
 
@@ -49,13 +46,6 @@ INSTALL_TARGET := $(INSTALL_PREFIX)/$(version)
 
 # Assemble arguments passed to tools/build.py
 BUILD_ARGS = ''
-<<<<<<< HEAD
-ifneq ($(BUILD_EXAMPLES),yes)
-	BUILD_ARGS += '--no-examples'
-endif
-ifneq ($(BUILD_DOCS),yes)
-	BUILD_ARGS += '--no-doc'
-=======
 ifeq ($(BUILD_DOCS),yes)
 	BUILD_ARGS += --with-docs
 else
@@ -71,7 +61,6 @@ ifeq ($(BUILD_EXAMPLES),yes)
 	endif
 else
 	BUILD_ARGS += --without-examples-sim --without-examples-fpga
->>>>>>> upstream/master
 endif
 
 
