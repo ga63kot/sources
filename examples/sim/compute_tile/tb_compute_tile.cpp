@@ -18,8 +18,12 @@ int main(int argc, char *argv[])
     VerilatedControl &simctrl = VerilatedControl::instance();
     simctrl.init(ct, argc, argv);
 
+<<<<<<< HEAD
 //    simctrl.addMemory("TOP.tb_compute_tile.u_compute_tile.u_ram.sp_ram.gen_sram_sp_impl.u_impl");
     simctrl.addMemory("TOP.tb_compute_tile.u_compute_tile.gen_cores[0].genblk1.u_debug_processor.u_debug_coprocessor.u_ram.sp_ram.gen_sram_sp_impl.u_impl");
+=======
+    simctrl.addMemory("TOP.tb_compute_tile.u_compute_tile.gen_sram.u_ram.sp_ram.gen_sram_sp_impl.u_impl");
+>>>>>>> upstream/master
     simctrl.setMemoryFuncs(do_readmemh, do_readmemh_file);
     simctrl.run();
 

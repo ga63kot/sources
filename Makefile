@@ -29,6 +29,12 @@ OBJDIR := objdir
 # Build configuration
 # Build and package the examples (yes/no)
 BUILD_EXAMPLES := yes
+<<<<<<< HEAD
+=======
+# Include FPGA bitstreams in the examples (yes/no)
+# Requires Xilinx Vivado to be installed
+BUILD_EXAMPLES_FPGA := yes
+>>>>>>> upstream/master
 # Build documentation (yes/no)
 BUILD_DOCS := yes
 
@@ -43,42 +49,71 @@ INSTALL_TARGET := $(INSTALL_PREFIX)/$(version)
 
 # Assemble arguments passed to tools/build.py
 BUILD_ARGS = ''
+<<<<<<< HEAD
 ifneq ($(BUILD_EXAMPLES),yes)
 	BUILD_ARGS += '--no-examples'
 endif
 ifneq ($(BUILD_DOCS),yes)
 	BUILD_ARGS += '--no-doc'
+=======
+ifeq ($(BUILD_DOCS),yes)
+	BUILD_ARGS += --with-docs
+else
+	BUILD_ARGS += --without-docs
 endif
+ifeq ($(BUILD_EXAMPLES),yes)
+	BUILD_ARGS += --with-examples-sim
+
+	ifeq ($(BUILD_EXAMPLES_FPGA),yes)
+		BUILD_ARGS += --with-examples-fpga
+	else
+		BUILD_ARGS += --without-examples-fpga
+	endif
+else
+	BUILD_ARGS += --without-examples-sim --without-examples-fpga
+>>>>>>> upstream/master
+endif
+
 
 build:
 	tools/build.py $(BUILD_ARGS) -o $(OBJDIR)
 
-install: build
+install:
+	@test -d "$(OBJDIR)/dist" || (echo "Run make build first."; exit 1)
 	mkdir -p $(INSTALL_TARGET)
 	cp -rT $(OBJDIR)/dist $(INSTALL_TARGET)
 
-dist: build
+dist:
+	@test -d "$(OBJDIR)/dist" || (echo "Run make build first."; exit 1)
 	tar -cz --directory $(OBJDIR) --exclude examples \
 		--transform "s/dist/$(version)/" \
 		-f $(OBJDIR)/optimsoc-$(version)-base.tar.gz dist
 
-	ifeq ($(BUILD_EXAMPLES),yes)
-		tar -cz --directory $(OBJDIR) \
-			--transform "s/dist/$(version)/" \
-			-f $(OBJDIR)/optimsoc-$(version)-examples.tar.gz dist/examples
-	endif
+ifeq ($(BUILD_EXAMPLES),yes)
+	tar -cz --directory $(OBJDIR) \
+		--transform "s/dist/$(version)/" \
+		-f $(OBJDIR)/optimsoc-$(version)-examples.tar.gz dist/examples
+endif
 
 	@echo
 	@echo The binary distribution packages have been written to
 	@echo $(OBJDIR)/optimsoc-$(version)-base.tar.gz
 
-	ifeq ($(BUILD_EXAMPLES),yes)
-		@echo The examples have been written to
-		@echo $(OBJDIR)/optimsoc-$(version)-examples.tar.gz
-	endif
+ifeq ($(BUILD_EXAMPLES),yes)
+	@echo The examples have been written to
+	@echo $(OBJDIR)/optimsoc-$(version)-examples.tar.gz
+endif
 
 clean:
 	rm -rf $(OBJDIR)
 
-.PHONY: build
+test:
+ifneq ($(BUILD_EXAMPLES_FPGA),yes)
+	# only run verilator-based system tests, not the FPGA ones
+	pytest -s -v test/systemtest/test_tutorial.py::TestTutorial
+else
+	pytest -s -v test/systemtest/test_tutorial.py
+endif
+
+.PHONY: build test
 

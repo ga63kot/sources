@@ -1,4 +1,4 @@
-/* Copyright (c) 2013 by the author(s)
+/* Copyright (c) 2016 by the author(s)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -18,30 +18,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * =============================================================================
- * 
- * System-wide definitions for an OpTiMSoC system instance.
+ * ============================================================================
  *
  * Author(s):
- *   Stefan Wallentowitz <stefan.wallentowitz@tum.de>
+ *   Stefan Wallentowitz <stefan@wallentowitz.de>
  */
 
-// Number of virtual channels
-`define VCHANNELS 3
+#include <opensocdebug.h>
 
-// Assign virtual channels to services
-`define VCHANNEL_LSU_REQ   'x
-`define VCHANNEL_LSU_RESP  'x
-`define VCHANNEL_DMA_REQ   0
-`define VCHANNEL_DMA_RESP  1
-`define VCHANNEL_MPSIMPLE  2
 
-`define OPTIMSOC_XDIM 1
-`define OPTIMSOC_YDIM 1
+int main(int argc, char* argv[]) {
+    struct osd_context *ctx;
 
-`define OPTIMSOC_SRAM_IMPLEMENTATION "PLAIN"
+    osd_new(&ctx, OSD_MODE_DAEMON, 0, 0);
 
-`define OPTIMSOC_DEBUG_ENABLE_STM 1
-`define OPTIMSOC_DEBUG_ENABLE_ITM 1
+    if (osd_connect(ctx) != OSD_SUCCESS) {
+        fprintf(stderr, "Cannot connect to Open SoC Debug daemon\n");
+        exit(1);
+    }
 
-`define OPTIMSOC_SRAM_VALIDATE_ADDRESS 1
+    while (1) {
+
+    }
+}

@@ -296,6 +296,25 @@ def build_tools(options):
         destf = os.path.join(bindistdir, f)
         file_copy(srcf, destf)
 
+    info(" + optimsoc-pgm-fpga")
+    pgmfpgasrcdir = os.path.join(src, "tools", "optimsoc-pgm-fpga")
+    pgmfpgasobjdir = os.path.join(objdir, "tools", "optimsoc-pgm-fpga")
+    bindistdir = os.path.join(dist, "host", "bin")
+    sharedistdir = os.path.join(dist, "host", "share")
+
+    # Copy build artifacts
+    info("  + Copy build artifacts")
+    ensure_directory(bindistdir)
+    ensure_directory(sharedistdir)
+    pgmfpgafiles_bin = ['optimsoc-pgm-fpga']
+    for f in pgmfpgafiles_bin:
+        srcf = os.path.join(pgmfpgasrcdir, f)
+        destf = os.path.join(bindistdir, f)
+        file_copy(srcf, destf)
+
+    file_copytree(os.path.join(pgmfpgasrcdir, 'scripts'),
+                  os.path.join(sharedistdir, "optimsoc-pgm-fpga"))
+
 """Build the SoC software
 
 Builds the SoC software.
@@ -700,6 +719,7 @@ def set_environment(options, env):
     pkgconfig = (
         "{dist}/host/share/pkgconfig:"
         "{dist}/host/lib/pkgconfig:"
+        "{dist}/host/lib64/pkgconfig:"
         "{dist}/soc/sw/share/pkgconfig".format(dist=dist))
     if 'PKG_CONFIG_PATH' in env:
         env['PKG_CONFIG_PATH'] = "{}:{}".format(pkgconfig, env['PKG_CONFIG_PATH'])
@@ -709,10 +729,16 @@ def set_environment(options, env):
     env['PATH'] =  "{dist}/host/bin:{existing_path}".format(dist=dist, existing_path=env['PATH'])
 
     ldlibrary = "{dist}/host/lib".format(dist=dist)
+    ldlibrary64 = "{dist}/host/lib64".format(dist=dist)
     if 'LD_LIBRARY_PATH' in env:
-        env['LD_LIBRARY_PATH'] = "{}:{}".format(ldlibrary, env['LD_LIBRARY_PATH'])
+        env['LD_LIBRARY_PATH'] = "{}:{}:{}".format(ldlibrary, ldlibrary64, env['LD_LIBRARY_PATH'])
     else:
-        env['LD_LIBRARY_PATH'] = ldlibrary
+        env['LD_LIBRARY_PATH'] = "{}:{}".format(ldlibrary, ldlibrary64)
+
+    dbg("Set environment: ")
+    for varname, value in env.items():
+        dbg("{}={}".format(varname, value))
+
 
 """Write the OpTiMSoC environment setup file (optimsoc-environment.sh)
 """
@@ -755,13 +781,13 @@ export LISNOC_RTL=$LISNOC/rtl
 
 export FUSESOC_CORES=$OPTIMSOC/soc/hw:$OPTIMSOC/external/lisnoc:$OPTIMSOC/external/opensocdebug/hardware:$OPTIMSOC/external/extra_cores:$OPTIMSOC/external/glip:$FUSESOC_CORES
 
-export PKG_CONFIG_PATH=$OPTIMSOC/host/share/pkgconfig:$OPTIMSOC/host/lib/pkgconfig:$OPTIMSOC/soc/sw/share/pkgconfig:$PKG_CONFIG_PATH
+export PKG_CONFIG_PATH=$OPTIMSOC/host/share/pkgconfig:$OPTIMSOC/host/lib/pkgconfig:$OPTIMSOC/host/lib64/pkgconfig:$OPTIMSOC/soc/sw/share/pkgconfig:$PKG_CONFIG_PATH
 export PATH=$OPTIMSOC/host/bin:$PATH
-export LD_LIBRARY_PATH=$OPTIMSOC/host/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=$OPTIMSOC/host/lib:$OPTIMSOC/host/lib64:$LD_LIBRARY_PATH
 
 # Adapting the PYTHONPATH is not so nice especially if Python 3 is involved.
 # But it works for us currently, and a real solution is rather tricky.
-export PYTHONPATH=$OPTIMSOC/host/lib/python2.7/site-packages:$PYTHONPATH
+export PYTHONPATH=$OPTIMSOC/host/lib/python2.7/site-packages:$OPTIMSOC/host/lib64/python2.7/site-packages:$PYTHONPATH
 """.format(options.version))
 
 """Get the version number from the source code
