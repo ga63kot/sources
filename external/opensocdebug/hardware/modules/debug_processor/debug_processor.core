@@ -13,3 +13,4 @@ file_type = systemVerilogSource
 usage = sim synth
 files =
   common/osd_debug_processor.sv
+  common/debug_packets_conversion.v
