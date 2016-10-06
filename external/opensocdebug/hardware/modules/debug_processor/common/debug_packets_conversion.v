@@ -50,15 +50,15 @@ module debug_packets_conversion(
 		IDLE: 
 		begin
 			if (packet_rdy) begin
-				nxt_state = SIZE_OUT; 			
+				nxt_state = DEST_OUT; 			
 			end	
 		end
 
-		SIZE_OUT:
+/*		SIZE_OUT:
 		begin
 				nxt_state = DEST_OUT; 				
 		end
-				
+*/				
 		DEST_OUT:
 		begin
 				nxt_state = ID_OUT; 				
@@ -82,11 +82,11 @@ module debug_packets_conversion(
   always @ (*)
   begin
 	release_packet_rdy = 0;
-	if (current_state == SIZE_OUT) begin
+/*	if (current_state == SIZE_OUT) begin
 		dbgnoc_in_flit_conv = {2'b01, size};
 		dbgnoc_in_valid_conv = 2'b10;
-        end else if (current_state == DEST_OUT) begin
-		dbgnoc_in_flit_conv = {2'b00, 5'b00110, 11'b0};
+        end else*/ if (current_state == DEST_OUT) begin
+		dbgnoc_in_flit_conv = {2'b01, 5'b00110, 11'b0};
 		dbgnoc_in_valid_conv = 2'b10;
 		release_packet_rdy = 1;
         end else if (current_state == ID_OUT) begin
@@ -102,7 +102,7 @@ module debug_packets_conversion(
   always @ (posedge clk)
   begin
 	if (count_data_out == size - 1) begin
-		count_data_out = 1;			
+		count_data_out = 0;			
 	end if (current_state == DATA_OUT | current_state == ID_OUT) begin
 		count_data_out = count_data_out + 1;
 		if (count_data_out == size - 1) begin
