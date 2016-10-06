@@ -77,6 +77,26 @@ module osd_debug_processor
    logic [1:0] dbgnoc_in_valid = 0;
    assign dbgnoc_in_valid [1] = dp_in.valid;
 
+   debug_packets_conversion
+   u_debug_packets_conversion(
+		// Inputs    		
+		.clk (clk),
+		.rst (rst),
+		.dbgnoc_in_flit (dp_in),
+		.dbgnoc_in_valid (dbgnoc_in_valid),
+		.dbgnoc_out_ready (dp_out_ready),
+
+		// Outputs
+		.dbgnoc_in_flit_conv (dbgnoc_in_flit_conv),
+		.dbgnoc_in_valid_conv (dbgnoc_in_valid_conv),
+		.dbgnoc_out_ready_conv (dbgnoc_out_ready_conv)
+   		);
+
+   dii_flit     dbgnoc_in_flit_conv;
+   logic [1:0]  dbgnoc_in_valid_conv;
+   logic [1:0]	dbgnoc_out_ready_conv;
+
+
    debug_coprocessor
    u_debug_coprocessor(
 		// Outputs
@@ -89,9 +109,9 @@ module osd_debug_processor
 		.clk (clk),
 		.rst (rst),
 		.rst_sys (0),
-		.dbgnoc_in_flit (dp_in),
-		.dbgnoc_in_valid (dbgnoc_in_valid),
-		.dbgnoc_out_ready (dp_out_ready)
+		.dbgnoc_in_flit (dbgnoc_in_flit_conv),
+		.dbgnoc_in_valid (dbgnoc_in_valid_conv),
+		.dbgnoc_out_ready (dbgnoc_out_ready_conv)
    		);
    // Outputs
 //   dbgnoc_in_ready, dbgnoc_out_flit, dbgnoc_out_valid, trace,
