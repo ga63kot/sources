@@ -220,7 +220,7 @@ module debug_coprocessor(
                  .dwb_dat_o             (busms_dat_o[c*2+1][DATA_WIDTH-1:0]), // Templated
                  .dwb_bte_o             (busms_bte_o[c*2+1][1:0]), // Templated
                  .dwb_cti_o             (busms_cti_o[c*2+1][2:0]), // Templated
-//                 .trace                 (trace[`DEBUG_TRACE_EXEC_WIDTH*(c+1)-1:`DEBUG_TRACE_EXEC_WIDTH*c]), // Templated
+                 .trace_exec            (trace[`DEBUG_TRACE_EXEC_WIDTH*(c+1)-1:`DEBUG_TRACE_EXEC_WIDTH*c]), // Templated
                  // Inputs
                  .clk_i                 (clk),                   // Templated
                  .bus_clk_i             (clk),                   // Templated
