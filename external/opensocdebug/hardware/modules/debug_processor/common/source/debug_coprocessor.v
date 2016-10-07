@@ -194,7 +194,7 @@ module debug_coprocessor(
           .trace          (trace[`DEBUG_TRACE_EXEC_WIDTH*(c+1)-1:`DEBUG_TRACE_EXEC_WIDTH*c]),
           ); */
          mor1kx_module
-               #(.ID(1))
+               #(.ID(0))
          u_core (
                  /*AUTOINST*/
                  // Outputs
