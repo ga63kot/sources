@@ -12,7 +12,7 @@
 // License.
 //
 // Authors:
-//    Stefan Wallentowitz <stefan@wallentowitz.de>
+//    Tim Fritzmann
 
 import dii_package::dii_flit;
 
@@ -97,8 +97,7 @@ module osd_debug_processor
 		// Outputs
 		.dbgnoc_in_ready (dp_in_ready),
 		.dbgnoc_out_flit (dp_out),
-		.dbgnoc_out_valid (dp_out.valid),
-		.trace (),		
+		.dbgnoc_out_valid (dp_out.valid),		
 
 		// Inputs
 		.clk (clk),
@@ -110,4 +109,4 @@ module osd_debug_processor
 		.dbgnoc_out_ready (dbgnoc_out_ready_conv)
    		);
 
-endmodule // osd_stm
+endmodule
