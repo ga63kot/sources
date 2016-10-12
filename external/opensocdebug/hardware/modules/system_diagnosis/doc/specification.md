@@ -47,14 +47,6 @@ There is a generic interface between the CPU Debug Unit and the system:
  `trace_insn`       | System->CPU Debug Unit | Instruction Trace Interface (of the Stack), trace insn
  `trace_enable`     | System->CPU Debug Unit | Instruction Trace Interface (of the Stack), trace enable
 
-# Memory Map
-
- Address Range | Description
- ------------- | -----------
- `0x200`       | Address width in Byte
- `0x201`       | Data width in Byte
- `0x202`       | `1` if unaligned accesses are allowed, `0` otherwise
-
 # Debug Content
 
 Before an event can be triggered the event has to be described.

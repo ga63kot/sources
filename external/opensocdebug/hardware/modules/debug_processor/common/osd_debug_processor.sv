@@ -12,7 +12,7 @@
 // License.
 //
 // Authors:
-//    Stefan Wallentowitz <stefan@wallentowitz.de>
+//    Tim Fritzmann
 
 import dii_package::dii_flit;
 
@@ -31,12 +31,7 @@ module osd_debug_processor
     output dii_flit             debug_out,
     input                       debug_out_ready,
 
-    input                       trace_valid,
-    input [15:0]                trace_id,
-    input [XLEN-1:0]            trace_value,
-
-    output                      trace_reg_enable,
-    output [REG_ADDR_WIDTH-1:0] trace_reg_addr
+    input 			rst_cpu
     );
 
    logic        reg_request;
@@ -102,21 +97,16 @@ module osd_debug_processor
 		// Outputs
 		.dbgnoc_in_ready (dp_in_ready),
 		.dbgnoc_out_flit (dp_out),
-		.dbgnoc_out_valid (dp_out.valid),
-		.trace (),		
+		.dbgnoc_out_valid (dp_out.valid),		
 
 		// Inputs
 		.clk (clk),
-		.rst (rst),
-		.rst_sys (0),
+		.rst (rst_cpu),
+		.rst_cpu (rst_cpu),
+		.rst_sys (rst_cpu),
 		.dbgnoc_in_flit (dbgnoc_in_flit_conv),
 		.dbgnoc_in_valid (dbgnoc_in_valid_conv),
 		.dbgnoc_out_ready (dbgnoc_out_ready_conv)
    		);
-   // Outputs
-//   dbgnoc_in_ready, dbgnoc_out_flit, dbgnoc_out_valid, trace,
-   // Inputs
-//   clk, rst, rst_cpu, rst_sys, dbgnoc_in_flit, dbgnoc_in_valid, dbgnoc_out_ready
-//   cpu_stall
 
-endmodule // osd_stm
+endmodule

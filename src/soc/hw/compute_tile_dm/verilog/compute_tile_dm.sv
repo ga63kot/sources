@@ -330,8 +330,8 @@ module compute_tile_dm
                  .debug_in (dii_out[1 + c*CONFIG.DEBUG_MODS_PER_CORE + 3]),
                  .debug_in_ready (dii_out_ready[1 + c*CONFIG.DEBUG_MODS_PER_CORE + 3]),
                  .debug_out (dii_in[1+c*CONFIG.DEBUG_MODS_PER_CORE + 3]),
-                 .debug_out_ready (dii_in_ready[1 + c*CONFIG.DEBUG_MODS_PER_CORE + 3]));
-//                 .trace_port (trace[c]));
+                 .debug_out_ready (dii_in_ready[1 + c*CONFIG.DEBUG_MODS_PER_CORE + 3]),
+		 .rst_cpu (rst_cpu));
 
          end
       end

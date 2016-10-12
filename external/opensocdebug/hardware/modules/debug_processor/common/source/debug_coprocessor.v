@@ -32,7 +32,7 @@
 
 module debug_coprocessor(
    // Outputs
-   dbgnoc_in_ready, dbgnoc_out_flit, dbgnoc_out_valid, trace,
+   dbgnoc_in_ready, dbgnoc_out_flit, dbgnoc_out_valid,
    // Inputs
    clk, rst, rst_cpu, rst_sys, dbgnoc_in_flit, dbgnoc_in_valid, dbgnoc_out_ready
 //   cpu_stall
@@ -81,9 +81,6 @@ module debug_coprocessor(
    output [DBG_NOC_FLIT_WIDTH-1:0] 	dbgnoc_out_flit;
    output [DBG_NOC_VCHANNELS-1:0]	dbgnoc_out_valid;
    input  [DBG_NOC_VCHANNELS-1:0] 	dbgnoc_out_ready;
-
-	//monitor trace interface
-   output [`DEBUG_TRACE_EXEC_WIDTH*CORES-1:0] trace;
 
 	//wb memory interface
    wire [ADDRESS_WIDTH-1:0] 	wb_mem_adr_i;
@@ -152,6 +149,7 @@ module debug_coprocessor(
    wire [NR_MASTERS-1:0]    				busms_rty_i_flat;
    wire [NR_MASTERS-1:0]    				busms_err_i_flat;
    wire [DATA_WIDTH*NR_MASTERS-1:0] 	busms_dat_i_flat;
+   mor1kx_trace_exec [CORES-1:0] 	trace;
 
    generate
       for (m = 0; m < NR_MASTERS; m = m + 1) begin : gen_busms_flat
@@ -194,7 +192,7 @@ module debug_coprocessor(
           .trace          (trace[`DEBUG_TRACE_EXEC_WIDTH*(c+1)-1:`DEBUG_TRACE_EXEC_WIDTH*c]),
           ); */
          mor1kx_module
-               #(.ID(1))
+               #(.ID(0))
          u_core (
                  /*AUTOINST*/
                  // Outputs
@@ -220,7 +218,7 @@ module debug_coprocessor(
                  .dwb_dat_o             (busms_dat_o[c*2+1][DATA_WIDTH-1:0]), // Templated
                  .dwb_bte_o             (busms_bte_o[c*2+1][1:0]), // Templated
                  .dwb_cti_o             (busms_cti_o[c*2+1][2:0]), // Templated
-//                 .trace                 (trace[`DEBUG_TRACE_EXEC_WIDTH*(c+1)-1:`DEBUG_TRACE_EXEC_WIDTH*c]), // Templated
+                 .trace_exec            (trace), 		 // Templated
                  // Inputs
                  .clk_i                 (clk),                   // Templated
                  .bus_clk_i             (clk),                   // Templated
@@ -516,37 +514,20 @@ module debug_coprocessor(
            .wbs_bte_i                   (bussl_bte_i[1]));       // Templated
 */
 
-	wire [`DEBUG_TRACE_EXEC_WIDTH*CORES-1:0] trace;
-
-   wire [`DEBUG_TRACE_EXEC_WIDTH*CORES-1:0] trace_array 		[0:CORES-1];
-   wire                                     trace_enable 	[0:CORES-1];
-   wire [31:0]                              trace_insn      [0:CORES-1];
-   wire [31:0]                              trace_pc        [0:CORES-1];
-   wire                                     trace_wben      [0:CORES-1];
-   wire [4:0]                               trace_wbreg     [0:CORES-1];
-   wire [31:0]                              trace_wbdata    [0:CORES-1];
-   wire [31:0]                              trace_r3        [0:CORES-1];
-   
-   wire [CORES-1:0]                         termination;
+   logic [31:0]        			trace_r3 [0:CORES-1];
+   wire [CORES-1:0]                 	termination;
 
 // synthesis translate_off
    genvar j;
    generate
-      for (j = 0; j < CORES; j = j+1) begin
-         assign trace_array[j] = trace[(j+1)*`DEBUG_TRACE_EXEC_WIDTH-1:`DEBUG_TRACE_EXEC_WIDTH*j];
-         assign trace_enable[j] = trace_array[j][`DEBUG_TRACE_EXEC_ENABLE_MSB:`DEBUG_TRACE_EXEC_ENABLE_LSB];
-         assign trace_insn[j] = trace_array[j][`DEBUG_TRACE_EXEC_INSN_MSB:`DEBUG_TRACE_EXEC_INSN_LSB];
-         assign trace_pc[j] = trace_array[j][`DEBUG_TRACE_EXEC_PC_MSB:`DEBUG_TRACE_EXEC_PC_LSB];
-         assign trace_wben[j] = trace_array[j][`DEBUG_TRACE_EXEC_WBEN_MSB:`DEBUG_TRACE_EXEC_WBEN_LSB];
-         assign trace_wbreg[j] = trace_array[j][`DEBUG_TRACE_EXEC_WBREG_MSB:`DEBUG_TRACE_EXEC_WBREG_LSB];
-         assign trace_wbdata[j] = trace_array[j][`DEBUG_TRACE_EXEC_WBDATA_MSB:`DEBUG_TRACE_EXEC_WBDATA_LSB];
-
-         r3_checker
-           u_r3_checker(.clk(clk),
-                        .valid(trace_enable[j]),
-                        .we (trace_wben[j]),
-                        .addr (trace_wbreg[j]),
-                        .data (trace_wbdata[j]),
+      for (j = 0; j < CORES; j = j+1) begin 
+         
+	  r3_checker
+          u_r3_checker( .clk(clk),
+                        .valid(trace[j].valid),
+                        .we (trace[j].wben),
+                        .addr (trace[j].wbreg),
+                        .data (trace[j].wbdata),
                         .r3 (trace_r3[j]));
 
             /* trace_monitor AUTO_TEMPLATE(
@@ -569,9 +550,9 @@ module debug_coprocessor(
                 .termination            (termination[j]),        // Templated
                 // Inputs
                 .clk                    (clk),
-                .enable                 (trace_enable[j]),       // Templated
-                .wb_pc                  (trace_pc[j]),           // Templated
-                .wb_insn                (trace_insn[j]),         // Templated
+                .enable                 (trace[j].valid),        // Templated
+                .wb_pc                  (trace[j].pc),           // Templated
+                .wb_insn                (trace[j].insn),         // Templated
                 .r3                     (trace_r3[j]),           // Templated
                 .termination_all        (termination));          // Templated
 
