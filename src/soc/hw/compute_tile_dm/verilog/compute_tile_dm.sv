@@ -322,16 +322,17 @@ module compute_tile_dm
         	.sram_ce (1'b1),
         	.sram_we (wb_mem_we_i));
             
-	    osd_debug_processor
+	    osd_debug_processor #(
+		.CONFIG (CONFIG))
               u_debug_processor
-                (.clk  (clk),
-                 .rst  (rst_dbg),
-                 .id   (DEBUG_BASEID + 1 + c*CONFIG.DEBUG_MODS_PER_CORE + 3),
-                 .debug_in (dii_out[1 + c*CONFIG.DEBUG_MODS_PER_CORE + 3]),
-                 .debug_in_ready (dii_out_ready[1 + c*CONFIG.DEBUG_MODS_PER_CORE + 3]),
-                 .debug_out (dii_in[1+c*CONFIG.DEBUG_MODS_PER_CORE + 3]),
-                 .debug_out_ready (dii_in_ready[1 + c*CONFIG.DEBUG_MODS_PER_CORE + 3]),
-		 .rst_cpu (rst_cpu));
+               (.clk  (clk),
+                .rst  (rst_dbg),
+                .id   (DEBUG_BASEID + 1 + c*CONFIG.DEBUG_MODS_PER_CORE + 3),
+                .debug_in (dii_out[1 + c*CONFIG.DEBUG_MODS_PER_CORE + 3]),
+                .debug_in_ready (dii_out_ready[1 + c*CONFIG.DEBUG_MODS_PER_CORE + 3]),
+                .debug_out (dii_in[1+c*CONFIG.DEBUG_MODS_PER_CORE + 3]),
+                .debug_out_ready (dii_in_ready[1 + c*CONFIG.DEBUG_MODS_PER_CORE + 3]),
+		.rst_cpu (rst_cpu));
 
          end
       end
