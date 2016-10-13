@@ -19,7 +19,8 @@ import dii_package::dii_flit;
 module osd_debug_processor
   #(
     parameter REG_ADDR_WIDTH = 5, // the address width of the core register file
-    parameter XLEN = 64
+    parameter XLEN = 64,
+    parameter config_t CONFIG = 'x
     )
    (
     input                       clk, rst,
@@ -92,7 +93,8 @@ module osd_debug_processor
    logic [1:0]	dbgnoc_out_ready_conv;
 
 
-   debug_coprocessor
+   debug_coprocessor #(
+		.CONFIG (CONFIG))
    u_debug_coprocessor(
 		// Outputs
 		.dbgnoc_in_ready (dp_in_ready),

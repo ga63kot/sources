@@ -1,4 +1,3 @@
-`include "optimsoc_def.vh"
 `include "dbg_config.vh"
 `include "diagnosis_config.vh"
 

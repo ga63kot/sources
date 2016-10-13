@@ -34,4 +34,3 @@ usage = sim synth
 files =
   common/source/diagnosis_config.vh
   common/source/diagnosis_missing_defines.vh
-  common/source/optimsoc_def.vh

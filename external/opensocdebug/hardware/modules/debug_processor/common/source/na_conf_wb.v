@@ -1,5 +1,4 @@
 `include "lisnoc_def.vh"
-`include "optimsoc_def.vh"
 
 module na_conf_wb(
 `ifdef OPTIMSOC_CLOCKDOMAINS
@@ -15,14 +14,9 @@ module na_conf_wb(
    );
 
    parameter TILEID = 0;
-   parameter NUMTILES = `OPTIMSOC_XDIM * `OPTIMSOC_YDIM;
    parameter COREBASE = 0;
-   parameter NUMCORES = 32'hx;
-   parameter DOMAIN_NUMCORES = NUMCORES;
-
-   parameter GLOBAL_MEMORY_SIZE = 32'h0;
-   parameter GLOBAL_MEMORY_TILE = 32'hx;
-   parameter LOCAL_MEMORY_SIZE = 32'hx;
+   
+   parameter config_t CONFIG = 'x;
 	
    input clk;
 	input rst;
@@ -59,17 +53,11 @@ module na_conf_wb(
     ); */
 	 
 	networkadapter_conf
-     #(.TILEID                (TILEID),
-       .NUMTILES              (NUMTILES),
+     #(.CONFIG		      (CONFIG),
+       .TILEID                (TILEID),
        .CONF_MPSIMPLE_PRESENT (0),
        .CONF_DMA_PRESENT      (0),
-       .COREBASE              (COREBASE),
-       .DOMAIN_NUMCORES       (DOMAIN_NUMCORES),
-       .GLOBAL_MEMORY_SIZE    (GLOBAL_MEMORY_SIZE),
-       .GLOBAL_MEMORY_TILE    (GLOBAL_MEMORY_TILE),
-       .LOCAL_MEMORY_SIZE     (LOCAL_MEMORY_SIZE),
-       .CTLIST (4'h0000),
-       .NUMCTS (1))
+       .COREBASE              (COREBASE))
    u_conf(
 `ifdef OPTIMSOC_CLOCKDOMAINS
  `ifdef OPTIMSOC_CDC_DYNAMIC

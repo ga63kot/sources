@@ -27,7 +27,6 @@
  */
 
 `include "lisnoc_def.vh"
-`include "optimsoc_def.vh"
 `include "dbg_config.vh"
 
 module debug_coprocessor(
@@ -69,6 +68,8 @@ module debug_coprocessor(
    parameter GLOBAL_MEMORY_TILE = 32'hx;
 
    parameter DMA_ENTRIES = 1;
+
+   parameter config_t CONFIG = 'x;
 
 	// port definitions
    input clk;
@@ -480,13 +481,9 @@ module debug_coprocessor(
     .wbm_\(.*\)      (busms_\1[NR_MASTERS-1]),
     .irq    (na_irq),
     );*/
-/*   na_conf_wb
+   na_conf_wb
       #(.TILEID(ID),
-        .NUMCORES(CORES), .COREBASE(COREBASE),
-        .DOMAIN_NUMCORES(DOMAIN_NUMCORES),
-        .GLOBAL_MEMORY_SIZE(GLOBAL_MEMORY_SIZE),
-        .GLOBAL_MEMORY_TILE(GLOBAL_MEMORY_TILE),
-        .LOCAL_MEMORY_SIZE(MEM_SIZE))
+        .CONFIG(CONFIG))
       u_na_conf(
 `ifdef OPTIMSOC_CLOCKDOMAINS
  `ifdef OPTIMSOC_CDC_DYNAMIC
@@ -495,7 +492,7 @@ module debug_coprocessor(
  `endif
 `endif
            /*AUTOINST*/
-/*           // Outputs
+           // Outputs
            .wbs_ack_o                   (bussl_ack_o[1]),        // Templated
            .wbs_rty_o                   (bussl_rty_o[1]),        // Templated
            .wbs_err_o                   (bussl_err_o[1]),        // Templated
@@ -512,7 +509,7 @@ module debug_coprocessor(
            .wbs_cab_i                   (bussl_cab_i[1]),        // Templated
            .wbs_cti_i                   (bussl_cti_i[1]),        // Templated
            .wbs_bte_i                   (bussl_bte_i[1]));       // Templated
-*/
+
 
    logic [31:0]        			trace_r3 [0:CORES-1];
    wire [CORES-1:0]                 	termination;
